@@ -1,0 +1,126 @@
+/* ==========================================================================
+   ROBO BATTLE — HUMAN vs AI : Responsive Design & Viewport Adjustments
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .brand-title {
+    font-size: 2.8rem;
+    letter-spacing: 4px;
+  }
+  
+  .brand-subtitle {
+    font-size: 1.1rem;
+    letter-spacing: 5px;
+  }
+  
+  .gesture-pip-container {
+    width: 180px;
+    bottom: 16px;
+    right: 16px;
+  }
+  
+  .gesture-canvas-wrapper {
+    height: 110px;
+  }
+}
+
+@media (max-width: 768px) {
+  #main-menu-screen {
+    padding: 24px;
+    justify-content: space-around;
+  }
+
+  .brand-title {
+    font-size: 2.2rem;
+    letter-spacing: 3px;
+  }
+
+  .brand-subtitle {
+    font-size: 0.95rem;
+    letter-spacing: 4px;
+  }
+
+  .menu-navigation {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .hud-top-bar {
+    top: 12px;
+    padding: 6px 16px 8px 16px;
+    gap: 12px;
+  }
+
+  .hud-timer-value {
+    font-size: 1.6rem;
+  }
+
+  .hud-enemies-alive {
+    font-size: 1.5rem;
+  }
+
+  .hud-minimap-container {
+    top: 12px;
+    right: 12px;
+    width: 110px;
+    height: 110px;
+  }
+
+  .hud-player-status {
+    bottom: 16px;
+    left: 16px;
+    width: 200px;
+  }
+
+  .hud-weapon-status {
+    bottom: 16px;
+  }
+
+  .ammo-counter-box {
+    padding: 6px 16px;
+  }
+
+  .ammo-current {
+    font-size: 1.6rem;
+  }
+
+  .gesture-pip-container {
+    width: 150px;
+    bottom: 80px;
+    right: 12px;
+  }
+
+  .gesture-canvas-wrapper {
+    height: 90px;
+  }
+
+  .game-over-card {
+    padding: 24px 20px;
+  }
+
+  .game-over-title {
+    font-size: 2.2rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+/* Touch controls overlay for mobile screens if touch is active */
+.touch-controls-layer {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+@media (pointer: coarse) {
+  .touch-controls-layer {
+    display: block;
+  }
+}

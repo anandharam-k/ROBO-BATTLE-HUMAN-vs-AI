@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ROBO BATTLE — HUMAN vs AI</title>
+  <meta name="description" content="Futuristic 3D robot shooting game pitting human combatants against 15 AI tactical combat droids in a 5-minute arena battle with weapon systems and webcam hand gesture controls." />
+  <meta property="og:title" content="ROBO BATTLE — HUMAN vs AI" />
+  <meta property="og:description" content="Futuristic 3D robot shooting game pitting human combatants against 15 AI tactical combat droids in a 5-minute arena battle with weapon systems and webcam hand gesture controls." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Google Fonts: Futuristic Cyberpunk Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+
+  <!-- Core Game Stylesheets -->
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/game.css" />
+  <link rel="stylesheet" href="/css/responsive.css" />
+</head>
+<body>
+  <!-- 3D WebGL Canvas Viewport -->
+  <div id="canvas-container"></div>
+
+  <!-- Screen Flash when player takes damage -->
+  <div id="damage-overlay"></div>
+
+  <!-- UI & HUD Overlay Layer -->
+  <div id="ui-layer">
+    
+    <!-- ====================================================================
+         1. MAIN MENU SCREEN
+         ==================================================================== -->
+    <div id="main-menu-screen">
+      <div class="menu-brand">
+        <div class="brand-badge">COMBAT ARENA SECTOR 07 // ONLINE</div>
+        <h1 class="brand-title">ROBO BATTLE</h1>
+        <div class="brand-subtitle">HUMAN VS AI</div>
+      </div>
+
+      <div class="menu-navigation">
+        <button id="btn-play-battle" class="cyber-btn btn-primary">
+          <span>&#9654;</span> PLAY BATTLE
+        </button>
+        <button id="btn-how-to-play" class="cyber-btn btn-secondary">
+          <span>&#9733;</span> HOW TO PLAY
+        </button>
+        <button id="btn-controls" class="cyber-btn btn-secondary">
+          <span>&#9881;</span> CONTROLS GUIDE
+        </button>
+        <button id="btn-gesture-setup" class="cyber-btn btn-secondary">
+          <span>&#9995;</span> HAND GESTURE SETUP
+        </button>
+        <button id="btn-high-scores" class="cyber-btn btn-secondary">
+          <span>&#127942;</span> SECTOR LEADERBOARD
+        </button>
+      </div>
+
+      <div class="menu-footer">
+        <div>MATCH PROTOCOL: 5-MIN ELIMINATION (1 VS 15 AI)</div>
+        <div class="menu-audio-quick">
+          <button id="btn-menu-mute" class="cyber-btn btn-secondary" style="padding: 6px 14px; font-size: 0.75rem;">
+            MUTE AUDIO
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         2. IN-GAME BATTLE HUD
+         ==================================================================== -->
+    <div id="hud-container">
+      
+      <!-- Top Center: Match Countdown & Squad Tracker -->
+      <div class="hud-top-bar">
+        <div class="hud-timer-block">
+          <span class="hud-label">TIME REMAINING</span>
+          <span id="hud-timer-display" class="hud-timer-value">05:00</span>
+        </div>
+        <div class="hud-separator"></div>
+        <div class="hud-enemies-block">
+          <span class="hud-label">AI DROIDS ACTIVE</span>
+          <div class="hud-enemies-counter">
+            <span id="hud-enemies-alive" class="hud-enemies-alive">15</span>
+            <span class="hud-enemies-total">/ 15</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Right: Radar Minimap -->
+      <div class="hud-minimap-container">
+        <span class="minimap-compass">N</span>
+        <canvas id="minimap-canvas" width="170" height="170"></canvas>
+      </div>
+
+      <!-- Top Left: Kill Feed -->
+      <div id="hud-kill-feed" class="hud-kill-feed"></div>
+
+      <!-- Center Crosshair & Dynamic Hit Marker -->
+      <div class="hud-crosshair-container">
+        <div class="crosshair-line top"></div>
+        <div class="crosshair-line bottom"></div>
+        <div class="crosshair-line left"></div>
+        <div class="crosshair-line right"></div>
+        <div class="crosshair-center-dot"></div>
+        
+        <div id="hud-hit-marker" class="hit-marker">
+          <div class="hit-marker-tick t1"></div>
+          <div class="hit-marker-tick t2"></div>
+          <div class="hit-marker-tick t3"></div>
+          <div class="hit-marker-tick t4"></div>
+        </div>
+      </div>
+
+      <!-- Bottom Left: Player Health, Shield, Stamina & Defense Badge -->
+      <div class="hud-player-status">
+        <div class="status-bar-wrapper">
+          <div class="status-bar-header">
+            <span style="color: var(--color-green-hp);">CHASSIS INTEGRITY (HP)</span>
+            <span id="hud-health-val" style="color: var(--color-green-hp);">100</span>
+          </div>
+          <div class="status-bar-bg">
+            <div id="hud-health-fill" class="status-bar-fill health"></div>
+          </div>
+        </div>
+
+        <div class="status-bar-wrapper">
+          <div class="status-bar-header">
+            <span style="color: var(--color-shield-bar);">PLASMA SHIELD</span>
+            <span id="hud-shield-val" style="color: var(--color-shield-bar);">50</span>
+          </div>
+          <div class="status-bar-bg">
+            <div id="hud-shield-fill" class="status-bar-fill shield"></div>
+          </div>
+        </div>
+
+        <div class="status-bar-wrapper">
+          <div class="status-bar-header">
+            <span style="color: #ffaa00; font-size: 0.65rem;">BOOST STAMINA</span>
+          </div>
+          <div class="status-bar-bg" style="height: 6px;">
+            <div id="hud-stamina-fill" class="status-bar-fill stamina"></div>
+          </div>
+        </div>
+
+        <div id="hud-defense-badge" class="status-defense-badge">
+          <span>&#128737;</span> DEFENSIVE STANCE ACTIVE (-50% DMG)
+        </div>
+      </div>
+
+      <!-- Bottom Center: Weapon Readout & Reload Status -->
+      <div class="hud-weapon-status">
+        <div class="ammo-counter-box">
+          <span id="hud-ammo-current" class="ammo-current">24</span>
+          <span id="hud-ammo-max" class="ammo-max">/ 24</span>
+        </div>
+        <div id="hud-reload-prompt" class="reload-prompt">PRESS [R] TO RELOAD</div>
+      </div>
+
+      <!-- Bottom Right: Webcam Hand Gesture PIP Preview -->
+      <div class="gesture-pip-container">
+        <div class="gesture-pip-header">
+          <span>GESTURE SENSOR</span>
+          <span id="gesture-status-badge" class="gesture-status-badge">OFF</span>
+        </div>
+        <div class="gesture-canvas-wrapper">
+          <video id="gesture-video" playsinline></video>
+          <canvas id="gesture-canvas" width="220" height="140"></canvas>
+        </div>
+        <div class="gesture-guide-text">
+          <button id="btn-toggle-pip-camera" class="cyber-btn btn-secondary" style="width: 100%; padding: 4px; font-size: 0.65rem;">
+            TOGGLE WEBCAM
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ====================================================================
+         3. PAUSE SCREEN
+         ==================================================================== -->
+    <div id="pause-screen">
+      <h2 style="font-size: 2.4rem; letter-spacing: 4px; color: var(--color-cyan-glow);">BATTLE PAUSED</h2>
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 280px;">
+        <button id="btn-resume-game" class="cyber-btn btn-primary">RESUME</button>
+        <button id="btn-restart-game" class="cyber-btn btn-secondary">RESTART MATCH</button>
+        <button id="btn-pause-quit" class="cyber-btn btn-danger">ABORT TO MENU</button>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         4. GAME OVER / VICTORY SCREEN
+         ==================================================================== -->
+    <div id="game-over-screen">
+      <div class="game-over-card">
+        <h2 id="game-over-title" class="game-over-title">VICTORY ACHIEVED</h2>
+        <div id="game-over-subtitle" style="font-size: 0.95rem; color: var(--color-text-dim); letter-spacing: 2px;"></div>
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <span class="stat-box-label">FINAL SCORE</span>
+            <span id="stat-final-score" class="stat-box-value" style="color: var(--color-cyan-glow);">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-box-label">DROIDS ELIMINATED</span>
+            <span id="stat-kills" class="stat-box-value" style="color: var(--color-red-danger);">0 / 15</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-box-label">TIME REMAINING</span>
+            <span id="stat-time-remaining" class="stat-box-value">00:00</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-box-label">COMBAT ACCURACY</span>
+            <span id="stat-accuracy" class="stat-box-value" style="color: var(--color-green-hp);">0.0%</span>
+          </div>
+        </div>
+
+        <div style="font-size: 0.9rem; letter-spacing: 2px; color: var(--color-gold-star); font-weight: bold;">
+          PERFORMANCE TIER: <span id="stat-combat-tier">A-TIER COMBAT ELITE</span>
+        </div>
+
+        <div class="name-input-group">
+          <input type="text" id="player-name-input" class="cyber-input" placeholder="ENTER CALLSIGN" maxlength="16" value="ApexPilot" />
+          <button id="btn-submit-score" class="cyber-btn btn-primary">SAVE SCORE</button>
+        </div>
+
+        <div style="display: flex; gap: 14px; width: 100%;">
+          <button id="btn-play-again" class="cyber-btn btn-primary" style="flex: 1;">PLAY AGAIN</button>
+          <button id="btn-game-over-menu" class="cyber-btn btn-secondary" style="flex: 1;">MAIN MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         5. MODALS: HOW TO PLAY, CONTROLS, GESTURES, HIGH SCORES
+         ==================================================================== -->
+    
+    <!-- How to Play Modal -->
+    <div id="modal-how-to-play" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>TACTICAL BRIEFING</h2>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>You command a lone blue-armored cybernetic strike unit deployed into Sector 07. Exactly <strong>15 autonomous AI combat droids</strong> have seized the industrial reactor arena.</p>
+          <br>
+          <h4 style="color: var(--color-cyan-glow);">MATCH DURATION: 05:00 (300 SECONDS)</h4>
+          <p>You have exactly 5 minutes to clear all 15 enemy units. The timer counts down continuously and halts if you pause.</p>
+          <br>
+          <h4 style="color: var(--color-red-danger);">THE 15 AI ENEMY DROIDS</h4>
+          <ul style="padding-left: 20px; margin-top: 6px;">
+            <li><strong>5 Scouts:</strong> Rapid, agile drones that flank and harass. (60 HP)</li>
+            <li><strong>7 Assaults:</strong> Tactical androids that use cover and fire lethal laser bursts. (100 HP)</li>
+            <li><strong>3 Heavies:</strong> Reinforced mechs with double heavy blasters. (220 HP)</li>
+          </ul>
+          <br>
+          <h4 style="color: var(--color-green-hp);">TACTICAL PICKUPS</h4>
+          <p>Scan the arena for green <strong>Nano Health Packs</strong> (+40 HP) and cyan <strong>Plasma Ammunition Crates</strong> (+24 Energy Cells).</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls Modal -->
+    <div id="modal-controls" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>CONTROLS MANUAL</h2>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);"><td style="padding: 8px; color: var(--color-cyan-glow); font-weight: bold;">W / A / S / D</td><td style="padding: 8px;">Combat Movement</td></tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);"><td style="padding: 8px; color: var(--color-cyan-glow); font-weight: bold;">MOUSE</td><td style="padding: 8px;">Camera Look & Crosshair Aiming (Click to lock)</td></tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);"><td style="padding: 8px; color: var(--color-cyan-glow); font-weight: bold;">LEFT CLICK</td><td style="padding: 8px;">Fire Energy Gun</td></tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);"><td style="padding: 8px; color: var(--color-cyan-glow); font-weight: bold;">SPACE</td><td style="padding: 8px;">Thruster Jump</td></tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);"><td style="padding: 8px; color: var(--color-cyan-glow); font-weight: bold;">SHIFT</td><td style="padding: 8px;">Sprint (Boost speed)</td></tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);"><td style="padding: 8px; color: var(--color-cyan-glow); font-weight: bold;">R</td><td style="padding: 8px;">Reload Energy Cell</td></tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);"><td style="padding: 8px; color: var(--color-cyan-glow); font-weight: bold;">C / RIGHT CLICK</td><td style="padding: 8px;">Defensive Stance (-50% damage received)</td></tr>
+            <tr><td style="padding: 8px; color: var(--color-cyan-glow); font-weight: bold;">ESC</td><td style="padding: 8px;">Pause Game</td></tr>
+          </table>
+          <p style="font-size: 0.85rem; color: var(--color-text-dim);">You can also enable webcam hand gestures at any time to aim, shoot, and defend using natural hand movements.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hand Gesture Setup Modal -->
+    <div id="modal-gesture-setup" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>HAND GESTURE PROTOCOL</h2>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>ROBO BATTLE supports real-time hand gesture tracking via browser webcam using <strong>MediaPipe Hands</strong> landmark detection.</p>
+          <br>
+          <div style="background: rgba(8, 14, 25, 0.8); border: 1px solid rgba(0, 240, 255, 0.3); padding: 16px; border-radius: 4px; margin-bottom: 16px;">
+            <div style="margin-bottom: 8px;"><strong>1. Open Palm:</strong> Enters weapon aiming mode.</div>
+            <div style="margin-bottom: 8px;"><strong>2. Pointing Index Finger:</strong> Adjusts crosshair aiming direction.</div>
+            <div style="margin-bottom: 8px;"><strong>3. Thumb & Index Pinch:</strong> Fires the energy blaster!</div>
+            <div><strong>4. Closed Fist:</strong> Activates Defensive Stance (creates blue shield barrier, reduces incoming damage by 50%).</div>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--color-text-dim); margin-bottom: 16px;">Click the button below or use the in-game PIP widget to enable the camera. Keyboard and mouse controls remain active simultaneously.</p>
+          <button class="cyber-btn btn-primary btn-modal-close" style="width: 100%;">ACKNOWLEDGED</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leaderboard / SQLite High Scores Modal -->
+    <div id="modal-high-scores" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>SECTOR LEADERBOARD (SQLITE)</h2>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div id="high-scores-list">
+            <!-- Dynamically populated from /api/scores -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Primary Game Module Entry Point -->
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>

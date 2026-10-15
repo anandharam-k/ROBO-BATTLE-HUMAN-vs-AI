@@ -1,0 +1,6 @@
+{
+  "name": "ROBO BATTLE — HUMAN vs AI",
+  "description": "Futuristic 3D robot shooting game pitting human combatants against 15 AI tactical combat droids in a 5-minute arena battle with weapon systems and webcam hand gesture controls.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
